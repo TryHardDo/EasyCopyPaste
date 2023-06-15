@@ -9,7 +9,8 @@ class EasyCopyPaste {
     constructor(mapFileName, mapFileLocation) {
         this.mapFileName = mapFileName;
         this.mapFileLocation = mapFileLocation;
-        this.specialDelimiters = [`'`, `-`, `/`];
+        this.specialDelimiters = [`'`, `-`, `/`, `.`];
+        this.mapCache = new Array();
     }
     /**
      * Method to convert items to easy copy paste string.
@@ -58,30 +59,35 @@ class EasyCopyPaste {
         return str.replace(/_/g, ' ');
     }
     mapString(str) {
-        const storedMap = this.loadMapData();
-        const found = this.findMappedValue(str, storedMap);
+        const found = this.findMappedValue(str, this.mapCache);
         if (found !== null) {
             return found.mappedName;
         }
         let shouldSave = false;
         const easyDelimiter = '_';
-        const strArr = str.split('').map((char) => {
+        const strArr = str.split('');
+        for (let i = 0; i < strArr.length; i++) {
+            let char = strArr[i];
             if (this.specialDelimiters.includes(char)) {
+                // If the next character is a space, replace current character with nothing
+                if (strArr[i + 1] === ' ') {
+                    strArr[i] = '';
+                }
+                else {
+                    strArr[i] = easyDelimiter;
+                }
                 shouldSave = true;
-                return easyDelimiter;
             }
             if (char === ' ') {
-                return easyDelimiter;
+                strArr[i] = easyDelimiter;
             }
-            return char;
-        });
+        }
         const mapped = {
             itemName: str,
             mappedName: strArr.join('')
         };
         if (shouldSave) {
-            storedMap.push(mapped);
-            this.saveMapData(storedMap);
+            this.mapCache.push(mapped);
         }
         return mapped.mappedName;
     }
