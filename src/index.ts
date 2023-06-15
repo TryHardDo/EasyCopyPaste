@@ -61,9 +61,7 @@ export default class EasyCopyPaste {
     }
 
     private reverseMapString(str: string): string {
-        const storedMap = this.loadMapData();
-
-        const found = this.findMappedValue(str, storedMap);
+        const found = this.findMappedValue(str, this.mapCache);
         if (found !== null) {
             return found.itemName;
         }
@@ -109,38 +107,5 @@ export default class EasyCopyPaste {
         }
     
         return mapped.mappedName;
-    }
- 
-    private saveMapData(mappedItems: MappedItem[]): void {
-        try {
-            fs.mkdirSync(this.mapFileLocation, { recursive: true });
-
-            const json = JSON.stringify(mappedItems);
-            fs.writeFileSync(join(this.mapFileLocation, this.mapFileName), json, { flag: 'w+' });
-        } catch (err) {
-            console.error('An error occurred while saving map data:', err);
-        }
-    }
-
-    private loadMapData(): MappedItem[] {
-        try {
-            const rawData = fs.readFileSync(join(this.mapFileLocation, this.mapFileName), { encoding: 'utf-8', flag: 'r' });
-            const obj = JSON.parse(rawData.length === 0 ? '[]' : rawData) as MappedItem[];
-    
-            if (obj) {
-                return obj;
-            }
-        } catch (err) {
-            const nodeErr = err as NodeJS.ErrnoException;
-
-            if (nodeErr.code === 'ENOENT') {
-                console.log('File does not exist. Creating new file.');
-                this.saveMapData(new Array());
-            } else {
-                console.error('An unexpected error occurred:', nodeErr);
-            }
-        }
-
-        return new Array();
     }
 }

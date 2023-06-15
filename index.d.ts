@@ -33,6 +33,4 @@ export default class EasyCopyPaste {
     private findMappedValue;
     private reverseMapString;
     private mapString;
-    private saveMapData;
-    private loadMapData;
 }

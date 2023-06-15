@@ -1,10 +1,5 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = __importDefault(require("fs"));
-const path_1 = require("path");
 class EasyCopyPaste {
     constructor(mapFileName, mapFileLocation) {
         this.mapFileName = mapFileName;
@@ -51,8 +46,7 @@ class EasyCopyPaste {
         }) || null;
     }
     reverseMapString(str) {
-        const storedMap = this.loadMapData();
-        const found = this.findMappedValue(str, storedMap);
+        const found = this.findMappedValue(str, this.mapCache);
         if (found !== null) {
             return found.itemName;
         }
@@ -90,36 +84,6 @@ class EasyCopyPaste {
             this.mapCache.push(mapped);
         }
         return mapped.mappedName;
-    }
-    saveMapData(mappedItems) {
-        try {
-            fs_1.default.mkdirSync(this.mapFileLocation, { recursive: true });
-            const json = JSON.stringify(mappedItems);
-            fs_1.default.writeFileSync((0, path_1.join)(this.mapFileLocation, this.mapFileName), json, { flag: 'w+' });
-        }
-        catch (err) {
-            console.error('An error occurred while saving map data:', err);
-        }
-    }
-    loadMapData() {
-        try {
-            const rawData = fs_1.default.readFileSync((0, path_1.join)(this.mapFileLocation, this.mapFileName), { encoding: 'utf-8', flag: 'r' });
-            const obj = JSON.parse(rawData.length === 0 ? '[]' : rawData);
-            if (obj) {
-                return obj;
-            }
-        }
-        catch (err) {
-            const nodeErr = err;
-            if (nodeErr.code === 'ENOENT') {
-                console.log('File does not exist. Creating new file.');
-                this.saveMapData(new Array());
-            }
-            else {
-                console.error('An unexpected error occurred:', nodeErr);
-            }
-        }
-        return new Array();
     }
 }
 exports.default = EasyCopyPaste;
