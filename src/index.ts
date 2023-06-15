@@ -9,7 +9,7 @@ export interface MappedItem {
 }
 
 export default class EasyCopyPaste {
-    private readonly specialDelimiters = [`'`, `-`, `/`];
+    private readonly specialDelimiters = [`'`, `-`, `/`, `.`];
 
     constructor(private mapFileName: string, private mapFileLocation: string) {}
 
