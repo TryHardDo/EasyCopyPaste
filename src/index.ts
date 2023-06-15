@@ -72,27 +72,34 @@ export default class EasyCopyPaste {
 
     private mapString(str: string): string {
         const storedMap = this.loadMapData();
-
+    
         const found = this.findMappedValue(str, storedMap);
         if (found !== null) {
             return found.mappedName;
         }
-
+    
         let shouldSave = false;
         const easyDelimiter = '_';
-        const strArr = str.split('').map((char) => {
+        const strArr = str.split('');
+        
+        for (let i = 0; i < strArr.length; i++) {
+            let char = strArr[i];
+            
             if (this.specialDelimiters.includes(char)) {
+                // If the next character is a space, replace current character with nothing
+                if (strArr[i + 1] === ' ') {
+                    strArr[i] = '';
+                } else {
+                    strArr[i] = easyDelimiter;
+                }
                 shouldSave = true;
-                return easyDelimiter;
             }
-
+    
             if (char === ' ') {
-                return easyDelimiter;
+                strArr[i] = easyDelimiter;
             }
-
-            return char;
-        });
-
+        }
+    
         const mapped = {
             itemName: str,
             mappedName: strArr.join('')
@@ -102,7 +109,7 @@ export default class EasyCopyPaste {
             storedMap.push(mapped);
             this.saveMapData(storedMap);
         }
-
+    
         return mapped.mappedName;
     }
  
