@@ -10,6 +10,7 @@ class EasyCopyPaste {
         this.mapFileName = mapFileName;
         this.mapFileLocation = mapFileLocation;
         this.specialDelimiters = [`'`, `-`, `/`, `.`];
+        this.mapCache = new Array();
     }
     /**
      * Method to convert items to easy copy paste string.
@@ -58,8 +59,7 @@ class EasyCopyPaste {
         return str.replace(/_/g, ' ');
     }
     mapString(str) {
-        const storedMap = this.loadMapData();
-        const found = this.findMappedValue(str, storedMap);
+        const found = this.findMappedValue(str, this.mapCache);
         if (found !== null) {
             return found.mappedName;
         }
@@ -87,8 +87,7 @@ class EasyCopyPaste {
             mappedName: strArr.join('')
         };
         if (shouldSave) {
-            storedMap.push(mapped);
-            this.saveMapData(storedMap);
+            this.mapCache.push(mapped);
         }
         return mapped.mappedName;
     }

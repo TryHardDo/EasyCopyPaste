@@ -7,6 +7,7 @@ export default class EasyCopyPaste {
     private mapFileName;
     private mapFileLocation;
     private readonly specialDelimiters;
+    private mapCache;
     constructor(mapFileName: string, mapFileLocation: string);
     /**
      * Method to convert items to easy copy paste string.

@@ -10,6 +10,7 @@ export interface MappedItem {
 
 export default class EasyCopyPaste {
     private readonly specialDelimiters = [`'`, `-`, `/`, `.`];
+    private mapCache: MappedItem[] = new Array();
 
     constructor(private mapFileName: string, private mapFileLocation: string) {}
 
@@ -71,9 +72,7 @@ export default class EasyCopyPaste {
     }
 
     private mapString(str: string): string {
-        const storedMap = this.loadMapData();
-    
-        const found = this.findMappedValue(str, storedMap);
+        const found = this.findMappedValue(str, this.mapCache);
         if (found !== null) {
             return found.mappedName;
         }
@@ -106,8 +105,7 @@ export default class EasyCopyPaste {
         } as MappedItem;
     
         if (shouldSave) {
-            storedMap.push(mapped);
-            this.saveMapData(storedMap);
+            this.mapCache.push(mapped);
         }
     
         return mapped.mappedName;
