@@ -1,9 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
-    constructor(mapFileName, mapFileLocation) {
-        this.mapFileName = mapFileName;
-        this.mapFileLocation = mapFileLocation;
+    constructor() {
         this.specialDelimiters = [`'`, `-`, `/`, `.`];
         this.mapCache = new Array();
     }

@@ -12,7 +12,7 @@ export default class EasyCopyPaste {
     private readonly specialDelimiters = [`'`, `-`, `/`, `.`];
     private mapCache: MappedItem[] = new Array();
 
-    constructor(private mapFileName: string, private mapFileLocation: string) {}
+    constructor() {}
 
     /**
      * Method to convert item names into easily copy-pasteable strings.
