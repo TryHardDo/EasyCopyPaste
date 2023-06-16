@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
     constructor() {
-        this.specialDelimiters = [`'`, `-`, `/`, `.`];
+        this.specialDelimiters = [`'`, `-`, `/`, `.`, `#`];
         this.mapCache = new Array();
     }
     /**
