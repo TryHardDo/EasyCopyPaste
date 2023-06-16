@@ -1,5 +1,3 @@
-export type CharMap = Map<number, string>;
-
 export interface MappedItem {
     itemName: string;
     mappedName: string;
