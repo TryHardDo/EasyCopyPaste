@@ -5,7 +5,6 @@ export interface MappedItem {
 export default class EasyCopyPaste {
     private readonly specialDelimiters;
     private mapCache;
-    constructor();
     /**
      * Method to convert item names into easily copy-pasteable strings.
      *
