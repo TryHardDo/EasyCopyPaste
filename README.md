@@ -5,7 +5,7 @@ Follow these steps to integrate the `EasyCopyPaste` module into your project:
 ## Step 1: Install the Module
 Add the module to your project using npm:
 ```shell
-npm i https://github.com/TryHardDo/EasyCopyStrings.git
+npm i https://github.com/TryHardDo/EasyCopyPaste.git
 ```
 
 ## Step 2: Create a Helper Class
