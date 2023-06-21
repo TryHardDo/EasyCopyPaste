@@ -1,11 +1,11 @@
 {
   "name": "easycopypaste",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This library offers a simple and efficient way to convert item names to an easily copyable string while keeping its reversibility.",
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build": "tsc -p ./"
+    "build": "tsc -p ."
   },
   "keywords": [],
   "author": "TryHardDo",

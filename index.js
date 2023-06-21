@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
     constructor() {
-        this.specialDelimiters = [`'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
+        this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
         this.mapCache = new Array();
     }
     /**
@@ -65,8 +65,7 @@ class EasyCopyPaste {
         for (let i = 0; i < strArr.length; i++) {
             let char = strArr[i];
             if (this.specialDelimiters.includes(char)) {
-                // If the next character is a space or a special char replace current character with nothing
-                if (strArr[i + 1] === ' ' || this.specialDelimiters.includes(strArr[i + 1])) {
+                if (strArr[i + 1] === ' ' || this.specialDelimiters.includes(strArr[i + 1]) || strArr.length === i + 1) {
                     strArr[i] = '';
                 }
                 else {
@@ -74,11 +73,7 @@ class EasyCopyPaste {
                 }
                 shouldSave = true;
             }
-            // Update char with the potentially modified value
             char = strArr[i];
-            if (char === ' ') {
-                strArr[i] = easyDelimiter;
-            }
         }
         const mapped = {
             itemName: str,

@@ -4,7 +4,7 @@ export interface MappedItem {
 }
 
 export default class EasyCopyPaste {
-    private readonly specialDelimiters = [`'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
+    private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
     private mapCache: MappedItem[] = new Array();
 
     /**
@@ -80,8 +80,7 @@ export default class EasyCopyPaste {
             let char = strArr[i];
             
             if (this.specialDelimiters.includes(char)) {
-                // If the next character is a space or a special char replace current character with nothing
-                if (strArr[i + 1] === ' ' || this.specialDelimiters.includes(strArr[i + 1])) {
+                if (strArr[i + 1] === ' ' || this.specialDelimiters.includes(strArr[i + 1]) || strArr.length === i + 1) {
                     strArr[i] = '';
                 } else {
                     strArr[i] = easyDelimiter;
@@ -89,12 +88,7 @@ export default class EasyCopyPaste {
                 shouldSave = true;
             }
             
-            // Update char with the potentially modified value
             char = strArr[i];
-            
-            if (char === ' ') {
-                strArr[i] = easyDelimiter;
-            }
         }
     
         const mapped = {
