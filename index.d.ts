@@ -32,10 +32,10 @@ export default class EasyCopyPaste {
      */
     fromEasyCopyPasteString(str: string): string;
     private findMappedValue;
-    private readonly defaultCharMap;
-    private readonly boldCharMap;
-    private swapToBold;
+    private defaultChars;
+    private boldChars;
     private swapToDefault;
+    private swapToBold;
     private reverseMapString;
     private mapString;
 }
