@@ -16,9 +16,10 @@ export default class EasyCopyPaste {
      * we don't store the string pair because such strings are easily reversible.
      *
      * @param {string} str The original item name to be parsed.
+     * @param {boolean} boldChars Swapping the chars to it's bolder version.
      * @returns {string} The parsed item name, ready for easy copying and pasting.
      */
-    toEasyCopyPasteString(str: string): string;
+    toEasyCopyPasteString(str: string, boldChars?: boolean): string;
     /**
      * Method to convert an easily copy-pasteable string back to the original format of the item's name.
      *
@@ -31,6 +32,10 @@ export default class EasyCopyPaste {
      */
     fromEasyCopyPasteString(str: string): string;
     private findMappedValue;
+    private readonly defaultCharMap;
+    private readonly boldCharMap;
+    private swapToBold;
+    private swapToDefault;
     private reverseMapString;
     private mapString;
 }

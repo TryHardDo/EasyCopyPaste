@@ -18,14 +18,15 @@ export default class EasyCopyPaste {
      * we don't store the string pair because such strings are easily reversible.
      *
      * @param {string} str The original item name to be parsed.
+     * @param {boolean} boldChars Swapping the chars to it's bolder version.
      * @returns {string} The parsed item name, ready for easy copying and pasting.
      */
-    public toEasyCopyPasteString(str: string): string {
+    public toEasyCopyPasteString(str: string, boldChars: boolean = false): string {
         if (str.length === 0) {
             throw new Error("The input string's length must be greater than 0!")
         }
 
-        return this.mapString(str);
+        return boldChars ? this.swapToBold(this.mapString(str)) : this.mapString(str);
     }
 
     /**
@@ -52,10 +53,42 @@ export default class EasyCopyPaste {
         return mappedItems.find((item) => {
             return (
                 lowerStr === item.itemName.toLowerCase() ||
-                lowerStr === item.mappedName.toLowerCase()
+                lowerStr === item.mappedName.toLowerCase() ||
+                lowerStr === this.swapToDefault(item.mappedName.toLowerCase())
             );
         }) || null;
     }
+
+    private readonly defaultCharMap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    private readonly boldCharMap = '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇';
+
+    private swapToBold(input: string): string {
+        let result = '';
+        for (const char of input) {
+          const charIndex = this.defaultCharMap.indexOf(char);
+          if (charIndex !== -1) {
+            const boldChar = this.boldCharMap[charIndex];
+            result += boldChar;
+          } else {
+            result += char;
+          }
+        }
+        return result;
+      }
+      
+      private swapToDefault(input: string): string {
+        let result = '';
+        for (const char of input) {
+          const charIndex = this.boldCharMap.indexOf(char);
+          if (charIndex !== -1) {
+            const defaultChar = this.defaultCharMap[charIndex];
+            result += defaultChar;
+          } else {
+            result += char;
+          }
+        }
+        return result;
+      }
 
     private reverseMapString(str: string): string {
         const found = this.findMappedValue(str, this.mapCache);
