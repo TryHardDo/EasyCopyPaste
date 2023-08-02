@@ -3,6 +3,11 @@ export interface MappedItem {
     mappedName: string;
 }
 
+export interface TransactionDescriptor {
+    itemName: string;
+    command: 'buy' | 'sell'
+}
+
 export default class EasyCopyPaste {
     private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
     private mapCache: MappedItem[] = new Array();
@@ -21,12 +26,14 @@ export default class EasyCopyPaste {
      * @param {boolean} boldChars Swapping the chars to it's bolder version.
      * @returns {string} The parsed item name, ready for easy copying and pasting.
      */
-    public toEasyCopyPasteString(str: string, boldChars: boolean = true): string {
+    public toEasyCopyPasteString(str: string, intent: 'buy' | 'sell', boldChars: boolean = true): string {
         if (str.length === 0) {
             throw new Error("The input string's length must be greater than 0!")
         }
 
-        return boldChars ? this.swapToBold(this.mapString(str)) : this.mapString(str);
+        const intentStr = intent === 'buy' ? 'sell' : 'buy';
+        const baseStr = `${intentStr}_${this.mapString(str)}`;
+        return boldChars ? this.swapToBold(baseStr) : this.mapString(baseStr);
     }
 
     /**
@@ -37,18 +44,25 @@ export default class EasyCopyPaste {
      * If the string does not correspond to a 'special' item name, the method replaces underscores with spaces.
      *
      * @param {string} str The easy copy-paste string.
-     * @returns {string} The original format of the item's name.
+     * @returns {TransactionDescriptor} Object which contains the original item name and the command type for checkout.
      */
-    public fromEasyCopyPasteString(str: string): string {
+    public fromEasyCopyPasteString(str: string): TransactionDescriptor {
         if (str.length === 0) {
             throw new Error("The input string's length must be greater than 0!")
         }
 
-        return this.reverseMapString(str);
+        const normalized = this.swapToDefault(str);
+        let cmd = normalized.startsWith('sell_') ? 'sell' : 'buy';
+        const clear = normalized.replace(`${cmd}_`, '');
+
+        return {
+            itemName: this.reverseMapString(clear),
+            command: cmd
+        } as TransactionDescriptor;
     }
 
     private findMappedValue(str: string, mappedItems: MappedItem[]): MappedItem | null {
-        const lowerStr = this.swapToDefault(str).toLowerCase();
+        const lowerStr = str.toLowerCase();
 
         return mappedItems.find((item) => {
             return (

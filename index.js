@@ -21,11 +21,13 @@ class EasyCopyPaste {
      * @param {boolean} boldChars Swapping the chars to it's bolder version.
      * @returns {string} The parsed item name, ready for easy copying and pasting.
      */
-    toEasyCopyPasteString(str, boldChars = true) {
+    toEasyCopyPasteString(str, intent, boldChars = true) {
         if (str.length === 0) {
             throw new Error("The input string's length must be greater than 0!");
         }
-        return boldChars ? this.swapToBold(this.mapString(str)) : this.mapString(str);
+        const intentStr = intent === 'buy' ? 'sell' : 'buy';
+        const baseStr = `${intentStr}_${this.mapString(str)}`;
+        return boldChars ? this.swapToBold(baseStr) : this.mapString(baseStr);
     }
     /**
      * Method to convert an easily copy-pasteable string back to the original format of the item's name.
@@ -35,16 +37,22 @@ class EasyCopyPaste {
      * If the string does not correspond to a 'special' item name, the method replaces underscores with spaces.
      *
      * @param {string} str The easy copy-paste string.
-     * @returns {string} The original format of the item's name.
+     * @returns {TransactionDescriptor} Object which contains the original item name and the command type for checkout.
      */
     fromEasyCopyPasteString(str) {
         if (str.length === 0) {
             throw new Error("The input string's length must be greater than 0!");
         }
-        return this.reverseMapString(str);
+        const normalized = this.swapToDefault(str);
+        let cmd = normalized.startsWith('sell_') ? 'sell' : 'buy';
+        const clear = normalized.replace(`${cmd}_`, '');
+        return {
+            itemName: this.reverseMapString(clear),
+            command: cmd
+        };
     }
     findMappedValue(str, mappedItems) {
-        const lowerStr = this.swapToDefault(str).toLowerCase();
+        const lowerStr = str.toLowerCase();
         return mappedItems.find((item) => {
             return (lowerStr === item.itemName.toLowerCase() ||
                 lowerStr === item.mappedName.toLowerCase());

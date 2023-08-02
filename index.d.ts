@@ -2,6 +2,10 @@ export interface MappedItem {
     itemName: string;
     mappedName: string;
 }
+export interface TransactionDescriptor {
+    itemName: string;
+    command: 'buy' | 'sell';
+}
 export default class EasyCopyPaste {
     private readonly specialDelimiters;
     private mapCache;
@@ -19,7 +23,7 @@ export default class EasyCopyPaste {
      * @param {boolean} boldChars Swapping the chars to it's bolder version.
      * @returns {string} The parsed item name, ready for easy copying and pasting.
      */
-    toEasyCopyPasteString(str: string, boldChars?: boolean): string;
+    toEasyCopyPasteString(str: string, intent: 'buy' | 'sell', boldChars?: boolean): string;
     /**
      * Method to convert an easily copy-pasteable string back to the original format of the item's name.
      *
@@ -28,9 +32,9 @@ export default class EasyCopyPaste {
      * If the string does not correspond to a 'special' item name, the method replaces underscores with spaces.
      *
      * @param {string} str The easy copy-paste string.
-     * @returns {string} The original format of the item's name.
+     * @returns {TransactionDescriptor} Object which contains the original item name and the command type for checkout.
      */
-    fromEasyCopyPasteString(str: string): string;
+    fromEasyCopyPasteString(str: string): TransactionDescriptor;
     private findMappedValue;
     private defaultChars;
     private boldChars;
