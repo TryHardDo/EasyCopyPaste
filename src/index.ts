@@ -21,7 +21,7 @@ export default class EasyCopyPaste {
      * @param {boolean} boldChars Swapping the chars to it's bolder version.
      * @returns {string} The parsed item name, ready for easy copying and pasting.
      */
-    public toEasyCopyPasteString(str: string, boldChars: boolean = false): string {
+    public toEasyCopyPasteString(str: string, boldChars: boolean = true): string {
         if (str.length === 0) {
             throw new Error("The input string's length must be greater than 0!")
         }
