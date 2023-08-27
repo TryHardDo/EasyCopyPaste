@@ -19,7 +19,7 @@ Please ensure that you have saved your ecosystem.json and files folder to preven
 - Fetch all changes from the newly added remote with the command: `git fetch tryharddo`. This action retrieves the necessary information from GitHub.
 
 ## Step 5:
-- Merge the implementation branch into your existing codebase using the command: `git merge TryHardDo/easy-copy-paste-implementation`. After the completion of this command, your codebase will include all the required changes.
+- Merge the implementation branch into your existing codebase using the command: `git merge tryharddo/easy-copy-paste-implementation`. After the completion of this command, your codebase will include all the required changes.
 
 ## Step 6:
 - Install any new dependencies that were introduced during the merge by running: `npm i`. This step ensures that all necessary dependencies are installed or updated.
