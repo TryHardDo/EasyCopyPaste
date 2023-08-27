@@ -10,7 +10,7 @@ Please ensure that you have saved your ecosystem.json and files folder to preven
 - Navigate to the location of your autobot files, typically within the tf2autobot folder where your source and Git files are located.
 
 ## Step 2:
-- Reset the code to its default source by executing the command: git reset HEAD --hard && git pull --prune. This action fetches the latest changes from the TF2autobot master branch.
+- Reset the code to its default source by executing the command: `git reset HEAD --hard && git pull --prune`. This action fetches the latest changes from the TF2autobot master branch.
 
 ## Step 3:
 - Integrate the changes from the forked repository into your Git remotes. Run the command: `git remote add tryharddo https://github.com/TryHardDo/tf2autobot.git`.
