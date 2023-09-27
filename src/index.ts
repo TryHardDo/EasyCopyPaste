@@ -12,7 +12,6 @@ export default class EasyCopyPaste {
     private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
     private mapCache: MappedItem[] = new Array();
     private readonly wordReplacements = Object.fromEntries([
-        ["Mann Co. Supply Crate Key", "Key"],
         ["Killstreak", "Ks"],
         ["Professional", "Pro"],
         ["Specialized", "Spec"]
@@ -77,12 +76,10 @@ export default class EasyCopyPaste {
     private replaceLongWords(str: string, shorten: boolean): string {
         // Replace words with their shortened or lengthened versions
         for (const [word, replacementWord] of Object.entries(this.wordReplacements)) {
-            const escapedWord = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); // Escape special characters
-            const wordRegex = new RegExp(`\\b${escapedWord.replace(/ /g, '\\s')}\\b`, 'gi');
-            str = str.replace(wordRegex, (match) =>
-                shorten ? replacementWord : match
-            );
+            const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+            str = str.replace(wordRegex, shorten ? replacementWord : word);
         }
+
         return str;
     }
 
