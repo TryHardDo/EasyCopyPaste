@@ -67,8 +67,9 @@ class EasyCopyPaste {
     replaceLongWords(str, shorten) {
         // Replace words with their shortened or lengthened versions
         for (const [word, replacementWord] of Object.entries(this.wordReplacements)) {
-            const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
-            str = str.replace(wordRegex, shorten ? replacementWord : word);
+            const escapedWord = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); // Escape special characters
+            const wordRegex = new RegExp(`\\b${escapedWord.replace(/ /g, '\\s')}\\b`, 'gi');
+            str = str.replace(wordRegex, (match) => shorten ? replacementWord : match);
         }
         return str;
     }
