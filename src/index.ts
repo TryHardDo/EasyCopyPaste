@@ -12,9 +12,9 @@ export default class EasyCopyPaste {
     private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
     private mapCache: MappedItem[] = new Array();
     private readonly wordReplacements = Object.fromEntries([
-        ['Killstreak', 'Ks'],
-        ['Professional', 'Pro'],
-        ['Specialized', 'Spec']
+        ['Professional Killstreak', 'Pro Ks'],
+        ['Specialized Killstreak', 'Spec Ks'],
+        ['Killstreak', 'Ks']
     ]);
 
     /**
@@ -74,12 +74,14 @@ export default class EasyCopyPaste {
      * @returns {string} The modified string with long/short words replaced.
      */
     private replaceLongWords(str: string, shorten: boolean): string {
-        // Replace words with their shortened or lengthened versions
-        for (const [word, replacementWord] of Object.entries(this.wordReplacements)) {
-            const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
-            str = str.replace(wordRegex, shorten ? replacementWord : word);
-        }
+        const replacements = Object.entries(this.wordReplacements)
+            .sort((a, b) => b[0].length - a[0].length);
 
+        // Replace phrases with their shortened or lengthened versions
+        for (const [phrase, replacementPhrase] of replacements) {
+            const phraseRegex = new RegExp(`\\b${phrase}\\b`, 'gi');
+            str = str.replace(phraseRegex, shorten ? replacementPhrase : phrase);
+        }
         return str;
     }
 
