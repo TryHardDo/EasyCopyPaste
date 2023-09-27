@@ -9,12 +9,12 @@ export interface TransactionDescriptor {
 }
 
 export default class EasyCopyPaste {
-    private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, ','];
+    private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
     private mapCache: MappedItem[] = new Array();
     private readonly wordReplacements = Object.fromEntries([
-        ["Killstreak", "Ks"],
-        ["Professional", "Pro"],
-        ["Specialized", "Spec"]
+        ['Killstreak', 'Ks'],
+        ['Professional', 'Pro'],
+        ['Specialized', 'Spec']
     ]);
 
     /**

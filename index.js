@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
     constructor() {
-        this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, ','];
+        this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
         this.mapCache = new Array();
         this.wordReplacements = Object.fromEntries([
-            ["Killstreak", "Ks"],
-            ["Professional", "Pro"],
-            ["Specialized", "Spec"]
+            ['Killstreak', 'Ks'],
+            ['Professional', 'Pro'],
+            ['Specialized', 'Spec']
         ]);
         this.defaultChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         this.boldChars = '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵';
