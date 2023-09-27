@@ -9,6 +9,7 @@ export interface TransactionDescriptor {
 export default class EasyCopyPaste {
     private readonly specialDelimiters;
     private mapCache;
+    private readonly wordReplacements;
     /**
      * Method to convert item names into easily copy-pasteable strings.
      *
@@ -35,6 +36,14 @@ export default class EasyCopyPaste {
      * @returns {TransactionDescriptor} Object which contains the original item name and the command type for checkout.
      */
     fromEasyCopyPasteString(str: string): TransactionDescriptor;
+    /**
+     * Method to replace long words with shortened versions and vice versa.
+     *
+     * @param {string} str The input string.
+     * @param {boolean} shorten Whether to shorten or lengthen the words.
+     * @returns {string} The modified string with long/short words replaced.
+     */
+    private replaceLongWords;
     private findMappedValue;
     private defaultChars;
     private boldChars;

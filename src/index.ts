@@ -11,6 +11,12 @@ export interface TransactionDescriptor {
 export default class EasyCopyPaste {
     private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
     private mapCache: MappedItem[] = new Array();
+    private readonly wordReplacements: Record<string, string> = {
+        'Mann Co. Supply Crate Key': 'key',
+        "Killstreak": "ks",
+        "Professional": "pro",
+        "Specialized": "spec",
+    };
 
     /**
      * Method to convert item names into easily copy-pasteable strings.
@@ -59,6 +65,25 @@ export default class EasyCopyPaste {
             itemName: this.reverseMapString(clear),
             command: cmd
         } as TransactionDescriptor;
+    }
+
+    /**
+     * Method to replace long words with shortened versions and vice versa.
+     *
+     * @param {string} str The input string.
+     * @param {boolean} shorten Whether to shorten or lengthen the words.
+     * @returns {string} The modified string with long/short words replaced.
+     */
+    private replaceLongWords(str: string, shorten: boolean): string {
+        // Replace words with their shortened or lengthened versions
+        for (const word in this.wordReplacements) {
+            if (Object.prototype.hasOwnProperty.call(this.wordReplacements, word)) {
+                const replacementWord = shorten ? this.wordReplacements[word] : word;
+                const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+                str = str.replace(wordRegex, replacementWord);
+            }
+        }
+        return str;
     }
 
     private findMappedValue(str: string, mappedItems: MappedItem[]): MappedItem | null {
@@ -114,7 +139,9 @@ export default class EasyCopyPaste {
             return found.itemName;
         }
 
-        return str.replace(/_/g, ' ');
+        // Replace shortened words with long words
+        let clear = str.replace(/_/g, ' ');
+        return this.replaceLongWords(clear, false);
     }
 
     private mapString(str: string): string {
@@ -122,7 +149,10 @@ export default class EasyCopyPaste {
         if (found !== null) {
             return found.mappedName;
         }
-    
+
+        // Replace long words with shortened versions
+        str = this.replaceLongWords(str, true);
+
         let shouldSave = false;
         const easyDelimiter = '_';
         const strArr = str.split('');
