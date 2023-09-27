@@ -11,12 +11,12 @@ export interface TransactionDescriptor {
 export default class EasyCopyPaste {
     private readonly specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
     private mapCache: MappedItem[] = new Array();
-    private readonly wordReplacements: Record<string, string> = {
-        'Mann Co. Supply Crate Key': 'key',
-        "Killstreak": "ks",
-        "Professional": "pro",
-        "Specialized": "spec",
-    };
+    private readonly wordReplacements = Object.fromEntries([
+        ["Mann Co. Supply Crate Key", "Key"],
+        ["Killstreak", "Ks"],
+        ["Professional", "Pro"],
+        ["Specialized", "Spec"]
+    ]);
 
     /**
      * Method to convert item names into easily copy-pasteable strings.
@@ -76,13 +76,11 @@ export default class EasyCopyPaste {
      */
     private replaceLongWords(str: string, shorten: boolean): string {
         // Replace words with their shortened or lengthened versions
-        for (const word in this.wordReplacements) {
-            if (Object.prototype.hasOwnProperty.call(this.wordReplacements, word)) {
-                const replacementWord = shorten ? this.wordReplacements[word] : word;
-                const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
-                str = str.replace(wordRegex, replacementWord);
-            }
+        for (const [word, replacementWord] of Object.entries(this.wordReplacements)) {
+            const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+            str = str.replace(wordRegex, shorten ? replacementWord : word);
         }
+
         return str;
     }
 
@@ -149,7 +147,7 @@ export default class EasyCopyPaste {
         if (found !== null) {
             return found.mappedName;
         }
-
+        const originalStr = str;
         // Replace long words with shortened versions
         str = this.replaceLongWords(str, true);
 
@@ -173,7 +171,7 @@ export default class EasyCopyPaste {
         }
     
         const mapped = {
-            itemName: str,
+            itemName: originalStr,
             mappedName: strArr.join('')
         } as MappedItem;
     

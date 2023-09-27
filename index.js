@@ -4,12 +4,12 @@ class EasyCopyPaste {
     constructor() {
         this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
         this.mapCache = new Array();
-        this.wordReplacements = {
-            'Mann Co. Supply Crate Key': 'key',
-            "Killstreak": "ks",
-            "Professional": "pro",
-            "Specialized": "spec",
-        };
+        this.wordReplacements = Object.fromEntries([
+            ["Mann Co. Supply Crate Key", "Key"],
+            ["Killstreak", "Ks"],
+            ["Professional", "Pro"],
+            ["Specialized", "Spec"]
+        ]);
         this.defaultChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         this.boldChars = '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵';
     }
@@ -66,12 +66,9 @@ class EasyCopyPaste {
      */
     replaceLongWords(str, shorten) {
         // Replace words with their shortened or lengthened versions
-        for (const word in this.wordReplacements) {
-            if (Object.prototype.hasOwnProperty.call(this.wordReplacements, word)) {
-                const replacementWord = shorten ? this.wordReplacements[word] : word;
-                const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
-                str = str.replace(wordRegex, replacementWord);
-            }
+        for (const [word, replacementWord] of Object.entries(this.wordReplacements)) {
+            const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+            str = str.replace(wordRegex, shorten ? replacementWord : word);
         }
         return str;
     }
@@ -123,6 +120,7 @@ class EasyCopyPaste {
         if (found !== null) {
             return found.mappedName;
         }
+        const originalStr = str;
         // Replace long words with shortened versions
         str = this.replaceLongWords(str, true);
         let shouldSave = false;
@@ -142,7 +140,7 @@ class EasyCopyPaste {
             char = strArr[i];
         }
         const mapped = {
-            itemName: str,
+            itemName: originalStr,
             mappedName: strArr.join('')
         };
         if (shouldSave) {
