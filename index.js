@@ -2,8 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
     constructor() {
-        this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`];
+        this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
         this.mapCache = new Array();
+        this.wordReplacements = Object.fromEntries([
+            ['Professional Killstreak', 'Pro Ks'],
+            ['Specialized Killstreak', 'Spec Ks'],
+            ['Killstreak', 'Ks']
+        ]);
         this.defaultChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         this.boldChars = '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵';
     }
@@ -51,6 +56,23 @@ class EasyCopyPaste {
             command: cmd
         };
     }
+    /**
+     * Method to replace long words with shortened versions and vice versa.
+     *
+     * @param {string} str The input string.
+     * @param {boolean} shorten Whether to shorten or lengthen the words.
+     * @returns {string} The modified string with long/short words replaced.
+     */
+    replaceLongWords(str, shorten) {
+        const replacements = Object.entries(this.wordReplacements)
+            .sort((a, b) => b[0].length - a[0].length);
+        // Replace phrases with their shortened or lengthened versions
+        for (const [phrase, replacementPhrase] of replacements) {
+            const phraseRegex = new RegExp(`\\b${phrase}\\b`, 'gi');
+            str = str.replace(phraseRegex, shorten ? replacementPhrase : phrase);
+        }
+        return str;
+    }
     findMappedValue(str, mappedItems) {
         const lowerStr = str.toLowerCase();
         return mappedItems.find((item) => {
@@ -90,13 +112,18 @@ class EasyCopyPaste {
         if (found !== null) {
             return found.itemName;
         }
-        return str.replace(/_/g, ' ');
+        // Replace shortened words with long words
+        let clear = str.replace(/_/g, ' ');
+        return this.replaceLongWords(clear, false);
     }
     mapString(str) {
         const found = this.findMappedValue(str, this.mapCache);
         if (found !== null) {
             return found.mappedName;
         }
+        const originalStr = str;
+        // Replace long words with shortened versions
+        str = this.replaceLongWords(str, true);
         let shouldSave = false;
         const easyDelimiter = '_';
         const strArr = str.split('');
@@ -114,7 +141,7 @@ class EasyCopyPaste {
             char = strArr[i];
         }
         const mapped = {
-            itemName: str,
+            itemName: originalStr,
             mappedName: strArr.join('')
         };
         if (shouldSave) {
