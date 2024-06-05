@@ -1,153 +1,162 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
-    constructor() {
-        this.specialDelimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
-        this.mapCache = new Array();
-        this.wordReplacements = Object.fromEntries([
-            ['Professional Killstreak', 'Pro Ks'],
-            ['Specialized Killstreak', 'Spec Ks'],
-            ['Killstreak', 'Ks']
+    constructor(useBoldChars = false, useShortKeyWordMapping = true) {
+        this.useBoldChars = useBoldChars;
+        this.useShortKeyWordMapping = useShortKeyWordMapping;
+        this.delimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
+        this.nativeCharSequence = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        this.boldCharSequence = "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵";
+        this.keyWordMap = new Map([
+            ["Australium", "Aus"],
+            ["Killstreak", "Ks"],
+            ["Specialized", "Spec"],
+            ["Professional", "Pro"]
         ]);
-        this.defaultChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        this.boldChars = '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵';
+        this.mappedItems = new Map;
     }
     /**
-     * Method to convert item names into easily copy-pasteable strings.
+     * Turns the input char sequence into an easily copyable string while it saves the original form and
+     * alternative forms into the heap.
      *
-     * If an item is considered 'exceptional' (i.e., its name contains special delimiters such as ',' '.' '-'),
-     * this method will replace those delimiters too and saves the string pair to an array where later
-     * we can retrieve it.
-     *
-     * If the item's name contains only spaces as delimiters (i.e., it's not 'exceptional'),
-     * we don't store the string pair because such strings are easily reversible.
-     *
-     * @param {string} str The original item name to be parsed.
-     * @param {boolean} boldChars Swapping the chars to it's bolder version.
-     * @returns {string} The parsed item name, ready for easy copying and pasting.
+     * @param {string} itemOriginalName The item's original name
+     * @param {'buy' | 'sell'} botSideIntent The intent from the bot's perspective
+     * @returns
      */
-    toEasyCopyPasteString(str, intent, boldChars = true) {
-        if (str.length === 0) {
-            throw new Error("The input string's length must be greater than 0!");
+    toEcpStr(itemOriginalName, botSideIntent) {
+        if (itemOriginalName.length === 0)
+            throw new Error("Empty string can't be turned into ECP string!");
+        // Customer side has inverted vision to intent. When they want to buy we actually having a sell listing.
+        const customerSideIntent = botSideIntent === 'buy' ? 'sell' : 'buy';
+        const mappedEcpEntry = this.mapString(itemOriginalName);
+        let finalEcpStr = mappedEcpEntry.value[0];
+        if (this.useShortKeyWordMapping) {
+            for (let ecpStrEntry of mappedEcpEntry.value) {
+                if (ecpStrEntry.length < finalEcpStr.length) {
+                    finalEcpStr = ecpStrEntry;
+                }
+            }
         }
-        const intentStr = intent === 'buy' ? 'sell' : 'buy';
-        const baseStr = `${intentStr}_${this.mapString(str)}`;
-        return boldChars ? this.swapToBold(baseStr) : this.mapString(baseStr);
+        const nativeEcpString = `${customerSideIntent}_${finalEcpStr}`;
+        if (this.useBoldChars) {
+            return this.swapToBoldChars(nativeEcpString);
+        }
+        return nativeEcpString;
     }
     /**
      * Method to convert an easily copy-pasteable string back to the original format of the item's name.
      *
-     * If the string corresponds to an item in the 'special' mapped item names, the method returns the stored original name.
-     *
-     * If the string does not correspond to a 'special' item name, the method replaces underscores with spaces.
-     *
-     * @param {string} str The easy copy-paste string.
-     * @returns {TransactionDescriptor} Object which contains the original item name and the command type for checkout.
+     * @param {string} ecpStr The ECP string which needs to be reversed back.
+     * @returns {IntentDescriptor | undefined} IntentDescriptor if mapped value was found, undefined otherwise.
      */
-    fromEasyCopyPasteString(str) {
-        if (str.length === 0) {
-            throw new Error("The input string's length must be greater than 0!");
+    reverseEcpStr(ecpStr) {
+        if (ecpStr.length === 0)
+            throw new Error("Input ECP string's lenght is 0!");
+        let nativeStr = this.swapToNativeChars(ecpStr);
+        // Lets decide what the customer want to do. Buy or sell stuffs.
+        let customerIntent = undefined;
+        if (nativeStr.startsWith('sell_')) {
+            customerIntent = 'sell';
         }
-        const normalized = this.swapToDefault(str);
-        let cmd = normalized.startsWith('sell_') ? 'sell' : 'buy';
-        const clear = normalized.replace(`${cmd}_`, '');
+        else if (nativeStr.startsWith('buy_')) {
+            customerIntent = 'buy';
+        }
+        if (customerIntent === undefined)
+            return undefined;
+        const intentClearedEcpStr = nativeStr.replace(`${customerIntent}_`, '');
+        const itemMappedOriginalName = this.findMappedValue(intentClearedEcpStr);
+        if (itemMappedOriginalName === undefined)
+            throw new Error("The item name was not found in the ECP map!");
         return {
-            itemName: this.reverseMapString(clear),
-            command: cmd
+            originalItemName: itemMappedOriginalName.key,
+            decodedIntent: customerIntent
         };
     }
-    /**
-     * Method to replace long words with shortened versions and vice versa.
-     *
-     * @param {string} str The input string.
-     * @param {boolean} shorten Whether to shorten or lengthen the words.
-     * @returns {string} The modified string with long/short words replaced.
-     */
-    replaceLongWords(str, shorten) {
-        const replacements = Object.entries(this.wordReplacements)
-            .sort((a, b) => b[0].length - a[0].length);
-        // Replace phrases with their shortened or lengthened versions
-        for (const [phrase, replacementPhrase] of replacements) {
-            const phraseRegex = new RegExp(`\\b${phrase}\\b`, 'gi');
-            str = str.replace(phraseRegex, shorten ? replacementPhrase : phrase);
+    findMappedValue(str) {
+        if (str.length === 0)
+            throw new Error("Input sequence length is 0!");
+        let lowerCaseStr = str.toLowerCase();
+        for (let [key, value] of this.mappedItems) {
+            const currentPair = { key, value };
+            if (key.toLowerCase() === lowerCaseStr)
+                return currentPair;
+            if (value.length === 0)
+                break;
+            for (let entry of value) {
+                if (entry.toLowerCase() === lowerCaseStr)
+                    return currentPair;
+            }
         }
-        return str;
+        return undefined;
     }
-    findMappedValue(str, mappedItems) {
-        const lowerStr = str.toLowerCase();
-        return mappedItems.find((item) => {
-            return (lowerStr === item.itemName.toLowerCase() ||
-                lowerStr === item.mappedName.toLowerCase());
-        }) || null;
+    mapString(originalItemName) {
+        if (originalItemName.length === 0)
+            throw new Error("The input sequence length is 0!");
+        const foundEntry = this.findMappedValue(originalItemName);
+        if (foundEntry !== undefined) {
+            return foundEntry;
+        }
+        const ecpStrDelimiter = '_';
+        const charArray = originalItemName.split('');
+        // Generate the closest version of ecp string
+        for (let i = 0; i < charArray.length; i++) {
+            let selectedChar = charArray[i];
+            if (this.delimiters.includes(selectedChar)) {
+                if (charArray[i + 1] === ' ' ||
+                    this.delimiters.includes(charArray[i + 1]) ||
+                    charArray.length === i + 1) {
+                    charArray[i] = '';
+                }
+                else {
+                    charArray[i] = ecpStrDelimiter;
+                }
+            }
+        }
+        let ecpStrFormatArray = [];
+        let basicEcpString = charArray.join('');
+        ecpStrFormatArray.push(basicEcpString);
+        if (this.useShortKeyWordMapping) {
+            let shortenedVersion = this.swapPreMappedKeywords(basicEcpString);
+            ecpStrFormatArray.push(shortenedVersion);
+        }
+        this.mappedItems.set(originalItemName, ecpStrFormatArray);
+        return { key: originalItemName, value: ecpStrFormatArray };
     }
-    swapToDefault(str) {
-        let decoded = '';
+    swapPreMappedKeywords(ecpString) {
+        let result = ecpString;
+        for (let [keyword, value] of this.keyWordMap) {
+            ;
+            const regex = new RegExp(keyword, 'gi');
+            result = result.replace(regex, value);
+        }
+        return result;
+    }
+    swapToBoldChars(str) {
+        let charSeq = [];
         for (let i = 0; i < str.length; i++) {
-            const index = this.boldChars.indexOf(str[i] + str[i + 1]);
+            const index = this.nativeCharSequence.indexOf(str[i]) * 2;
+            if (index >= 0) {
+                charSeq.push(this.boldCharSequence[index] + this.boldCharSequence[index + 1]);
+            }
+            else {
+                charSeq.push(str[i]);
+            }
+        }
+        return charSeq.join('');
+    }
+    swapToNativeChars(str) {
+        let charSeq = [];
+        for (let i = 0; i < str.length; i++) {
+            const index = this.boldCharSequence.indexOf(str[i] + str[i + 1]);
             if (index !== -1) {
-                decoded += this.defaultChars[index / 2];
+                charSeq.push(this.nativeCharSequence[index / 2]);
                 i++;
             }
             else {
-                decoded += str[i];
+                charSeq.push(str[i]);
             }
         }
-        return decoded;
-    }
-    swapToBold(str) {
-        let encoded = '';
-        for (let i = 0; i < str.length; i++) {
-            const index = this.defaultChars.indexOf(str[i]) * 2;
-            if (index >= 0) {
-                encoded += this.boldChars[index] + this.boldChars[index + 1];
-            }
-            else {
-                encoded += str[i];
-            }
-        }
-        return encoded;
-    }
-    reverseMapString(str) {
-        const found = this.findMappedValue(str, this.mapCache);
-        if (found !== null) {
-            return found.itemName;
-        }
-        // Replace shortened words with long words
-        let clear = str.replace(/_/g, ' ');
-        return this.replaceLongWords(clear, false);
-    }
-    mapString(str) {
-        const found = this.findMappedValue(str, this.mapCache);
-        if (found !== null) {
-            return found.mappedName;
-        }
-        const originalStr = str;
-        // Replace long words with shortened versions
-        str = this.replaceLongWords(str, true);
-        let shouldSave = false;
-        const easyDelimiter = '_';
-        const strArr = str.split('');
-        for (let i = 0; i < strArr.length; i++) {
-            let char = strArr[i];
-            if (this.specialDelimiters.includes(char)) {
-                if (strArr[i + 1] === ' ' || this.specialDelimiters.includes(strArr[i + 1]) || strArr.length === i + 1) {
-                    strArr[i] = '';
-                }
-                else {
-                    strArr[i] = easyDelimiter;
-                }
-                shouldSave = true;
-            }
-            char = strArr[i];
-        }
-        const mapped = {
-            itemName: originalStr,
-            mappedName: strArr.join('')
-        };
-        if (shouldSave) {
-            this.mapCache.push(mapped);
-        }
-        return mapped.mappedName;
+        return charSeq.join('');
     }
 }
 exports.default = EasyCopyPaste;
