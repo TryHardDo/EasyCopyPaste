@@ -128,13 +128,13 @@ export default class EasyCopyPaste {
 
         let ecpStrFormatArray = [];
 
+        // Basic ECP version
         let basicEcpString = charArray.join('');
         ecpStrFormatArray.push(basicEcpString);
 
-        if (this.useShortKeyWordMapping) {
-            let shortenedVersion = this.swapPreMappedKeywords(basicEcpString);
-            ecpStrFormatArray.push(shortenedVersion);
-        }
+        // Keyword swapped ECp version
+        let shortenedVersion = this.swapPreMappedKeywords(basicEcpString);
+        ecpStrFormatArray.push(shortenedVersion);
 
         this.mappedItems.set(originalItemName, ecpStrFormatArray);
 
