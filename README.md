@@ -28,7 +28,7 @@ Please ensure that you have saved your ecosystem.json and files folder to preven
 - Rebuild the sources of your bot to incorporate the fresh code by executing: `npm run` build.
 
 ## Step 8:
-- Your bot is now ready for operation. However, you need to add a placeholder to your `options.json` file. Refer to the [autobot wiki](https://github.com/TF2Autobot/tf2autobot/wiki/Configure-your-options.json-file#-listing-note-settings-) to locate the appropriate settings object. Insert the following placeholder `%easy_copy_paste%` anywhere within the note text.
+- Your bot is now ready for operation. However, you need to add a placeholder to your `options.json` file. Refer to the [autobot wiki](https://github.com/TF2Autobot/tf2autobot/wiki/Configure-your-options.json-file#-listing-note-settings-) to locate the appropriate settings object. Insert the following placeholder `%ecp_item%` anywhere within the note text.
 
 ## Step 9:
 - Save everything and boot up the bot and let's start trading again!
