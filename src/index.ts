@@ -15,7 +15,6 @@ export default class EasyCopyPaste {
 
     constructor(private useBoldChars: boolean = false, private useShortKeyWordMapping: boolean = true) {}
 
-
     /**
      * Turns the input char sequence into an easily copyable string while it saves the original form and
      * alternative forms into the memory.
