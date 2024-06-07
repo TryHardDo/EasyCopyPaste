@@ -99,18 +99,10 @@ export default class EasyCopyPaste {
         return undefined;
     }
 
-    private mapString(originalItemName: string): KeyValuePair<string, string[]> {
-        if (originalItemName.length === 0) throw new Error("The input sequence length is 0!");
-        const foundEntry = this.findMappedValue(originalItemName);
-
-        if (foundEntry !== undefined) {
-            return foundEntry;
-        }
-
+    private constructEcpCharSequence(originalItemName: string): string {
         const ecpStrDelimiter = '_';
         const charArray = originalItemName.split('');
 
-        // Generate the closest version of ecp string
         for (let i = 0; i < charArray.length; i++) {
             let selectedChar = charArray[i];
 
@@ -126,19 +118,32 @@ export default class EasyCopyPaste {
             }
         }
 
+        return charArray.join('');
+    }
+
+    private mapString(itemName: string): KeyValuePair<string, string[]> {
+        if (itemName.length === 0) throw new Error("Could not map input to ECP format because the input sequence's length is 0!");
+        const foundEntry = this.findMappedValue(itemName);
+
+        if (foundEntry !== undefined) {
+            return foundEntry;
+        }
+
         let ecpStrFormatArray = [];
 
-        // Basic ECP version
-        let basicEcpString = charArray.join('');
-        ecpStrFormatArray.push(basicEcpString);
+        // Directly encoded ECP
+        ecpStrFormatArray.push(this.constructEcpCharSequence(itemName));
 
-        // Keyword swapped ECp version
-        let shortenedVersion = this.swapPreMappedKeywords(basicEcpString);
-        ecpStrFormatArray.push(shortenedVersion);
+        // ECP with swapped words before encoding
+        ecpStrFormatArray.push(this.constructEcpCharSequence(this.swapPreMappedKeywords(itemName)));
 
-        this.mappedItems.set(originalItemName, ecpStrFormatArray);
+        // ECP with swapped words after encoding
+        ecpStrFormatArray.push(this.swapPreMappedKeywords(this.constructEcpCharSequence(itemName)));
 
-        return { key: originalItemName, value: ecpStrFormatArray };
+        // Adding encoded versions to the ECP map
+        this.mappedItems.set(itemName, ecpStrFormatArray);
+
+        return { key: itemName, value: ecpStrFormatArray };
     }
 
     private swapPreMappedKeywords(ecpString: string): string {
