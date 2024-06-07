@@ -18,7 +18,7 @@ export default class EasyCopyPaste {
 
     /**
      * Turns the input char sequence into an easily copyable string while it saves the original form and
-     * alternative forms into the heap.
+     * alternative forms into the memory.
      * 
      * @param {string} itemOriginalName The item's original name 
      * @param {'buy' | 'sell'} botSideIntent The intent from the bot's perspective
