@@ -1,29 +1,21 @@
 export default class EasyCopyPaste {
-    private useBoldChars;
-    private useShortKeyWordMapping;
     private readonly delimiters;
     private readonly nativeCharSequence;
     private readonly boldCharSequence;
-    private readonly keyWordMap;
     private readonly mappedItems;
-    constructor(useBoldChars?: boolean, useShortKeyWordMapping?: boolean);
-    /**
-     * Turns the input char sequence into an easily copyable string while it saves the original form and
-     * alternative forms into the heap.
-     *
-     * @param {string} itemOriginalName The item's original name
-     * @param {'buy' | 'sell'} botSideIntent The intent from the bot's perspective
-     * @returns
-     */
+    private _useBoldChars;
+    private _useWordSwap;
+    private _keyWordMap;
+    get useBoldChars(): boolean;
+    set useBoldChars(useBoldChars: boolean);
+    get useWordSwap(): boolean;
+    set useWordSwap(useWordSwap: boolean);
+    get keyWordMap(): Map<string, string>;
+    set keyWordMap(wordMap: Map<string, string>);
     toEcpStr(itemOriginalName: string, botSideIntent: 'buy' | 'sell'): string;
-    /**
-     * Method to convert an easily copy-pasteable string back to the original format of the item's name.
-     *
-     * @param {string} ecpStr The ECP string which needs to be reversed back.
-     * @returns {IntentDescriptor | undefined} IntentDescriptor if mapped value was found, undefined otherwise.
-     */
     reverseEcpStr(ecpStr: string): IntentDescriptor | undefined;
     private findMappedValue;
+    private constructEcpCharSequence;
     private mapString;
     private swapPreMappedKeywords;
     private swapToBoldChars;

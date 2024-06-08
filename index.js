@@ -1,36 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
-    constructor(useBoldChars = false, useShortKeyWordMapping = true) {
-        this.useBoldChars = useBoldChars;
-        this.useShortKeyWordMapping = useShortKeyWordMapping;
+    constructor() {
         this.delimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
         this.nativeCharSequence = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         this.boldCharSequence = "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵";
-        this.keyWordMap = new Map([
+        this.mappedItems = new Map;
+        this._useBoldChars = false;
+        this._useWordSwap = false;
+        this._keyWordMap = new Map([
             ["Australium", "Aus"],
             ["Killstreak", "Ks"],
             ["Specialized", "Spec"],
-            ["Professional", "Pro"]
+            ["Professional", "Pro"],
+            ["'s", "s"]
         ]);
-        this.mappedItems = new Map;
     }
-    /**
-     * Turns the input char sequence into an easily copyable string while it saves the original form and
-     * alternative forms into the heap.
-     *
-     * @param {string} itemOriginalName The item's original name
-     * @param {'buy' | 'sell'} botSideIntent The intent from the bot's perspective
-     * @returns
-     */
+    get useBoldChars() {
+        return this._useBoldChars;
+    }
+    set useBoldChars(useBoldChars) {
+        this._useBoldChars = useBoldChars;
+    }
+    get useWordSwap() {
+        return this._useWordSwap;
+    }
+    set useWordSwap(useWordSwap) {
+        this._useWordSwap = useWordSwap;
+    }
+    get keyWordMap() {
+        return this._keyWordMap;
+    }
+    set keyWordMap(wordMap) {
+        this._keyWordMap = wordMap;
+    }
     toEcpStr(itemOriginalName, botSideIntent) {
         if (itemOriginalName.length === 0)
-            throw new Error("Empty string can't be turned into ECP string!");
+            throw new Error("Input could not be turned into ECP string because its length was 0!");
         // Customer side has inverted vision to intent. When they want to buy we actually having a sell listing.
         const customerSideIntent = botSideIntent === 'buy' ? 'sell' : 'buy';
         const mappedEcpEntry = this.mapString(itemOriginalName);
         let finalEcpStr = mappedEcpEntry.value[0];
-        if (this.useShortKeyWordMapping) {
+        if (this.useWordSwap) {
             for (let ecpStrEntry of mappedEcpEntry.value) {
                 if (ecpStrEntry.length < finalEcpStr.length) {
                     finalEcpStr = ecpStrEntry;
@@ -43,12 +54,6 @@ class EasyCopyPaste {
         }
         return nativeEcpString;
     }
-    /**
-     * Method to convert an easily copy-pasteable string back to the original format of the item's name.
-     *
-     * @param {string} ecpStr The ECP string which needs to be reversed back.
-     * @returns {IntentDescriptor | undefined} IntentDescriptor if mapped value was found, undefined otherwise.
-     */
     reverseEcpStr(ecpStr) {
         if (ecpStr.length === 0)
             throw new Error("Input ECP string's lenght is 0!");
@@ -89,16 +94,9 @@ class EasyCopyPaste {
         }
         return undefined;
     }
-    mapString(originalItemName) {
-        if (originalItemName.length === 0)
-            throw new Error("The input sequence length is 0!");
-        const foundEntry = this.findMappedValue(originalItemName);
-        if (foundEntry !== undefined) {
-            return foundEntry;
-        }
+    constructEcpCharSequence(originalItemName) {
         const ecpStrDelimiter = '_';
         const charArray = originalItemName.split('');
-        // Generate the closest version of ecp string
         for (let i = 0; i < charArray.length; i++) {
             let selectedChar = charArray[i];
             if (this.delimiters.includes(selectedChar)) {
@@ -112,20 +110,26 @@ class EasyCopyPaste {
                 }
             }
         }
-        let ecpStrFormatArray = [];
-        // Basic ECP version
-        let basicEcpString = charArray.join('');
-        ecpStrFormatArray.push(basicEcpString);
-        // Keyword swapped ECp version
-        let shortenedVersion = this.swapPreMappedKeywords(basicEcpString);
-        ecpStrFormatArray.push(shortenedVersion);
-        this.mappedItems.set(originalItemName, ecpStrFormatArray);
-        return { key: originalItemName, value: ecpStrFormatArray };
+        return charArray.join('');
+    }
+    mapString(itemName) {
+        if (itemName.length === 0)
+            throw new Error("Could not map input to ECP format because the input sequence's length is 0!");
+        const foundEntry = this.findMappedValue(itemName);
+        if (foundEntry !== undefined) {
+            return foundEntry;
+        }
+        let ecpFormatSet = new Set();
+        ecpFormatSet.add(this.constructEcpCharSequence(itemName));
+        ecpFormatSet.add(this.constructEcpCharSequence(this.swapPreMappedKeywords(itemName)));
+        ecpFormatSet.add(this.swapPreMappedKeywords(this.constructEcpCharSequence(itemName)));
+        const ecpFormatDistinctArray = [...ecpFormatSet];
+        this.mappedItems.set(itemName, ecpFormatDistinctArray);
+        return { key: itemName, value: ecpFormatDistinctArray };
     }
     swapPreMappedKeywords(ecpString) {
         let result = ecpString;
         for (let [keyword, value] of this.keyWordMap) {
-            ;
             const regex = new RegExp(keyword, 'gi');
             result = result.replace(regex, value);
         }
