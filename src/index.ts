@@ -115,21 +115,16 @@ export default class EasyCopyPaste {
             return foundEntry;
         }
 
-        let ecpStrFormatArray = [];
+        let ecpFormatSet = new Set<string>();
 
-        // Directly encoded ECP
-        ecpStrFormatArray.push(this.constructEcpCharSequence(itemName));
+        ecpFormatSet.add(this.constructEcpCharSequence(itemName));
+        ecpFormatSet.add(this.constructEcpCharSequence(this.swapPreMappedKeywords(itemName)));
+        ecpFormatSet.add(this.swapPreMappedKeywords(this.constructEcpCharSequence(itemName)));
 
-        // ECP with swapped words before encoding
-        ecpStrFormatArray.push(this.constructEcpCharSequence(this.swapPreMappedKeywords(itemName)));
+        const ecpFormatDistinctArray = [...ecpFormatSet];
+        this.mappedItems.set(itemName, ecpFormatDistinctArray);
 
-        // ECP with swapped words after encoding
-        ecpStrFormatArray.push(this.swapPreMappedKeywords(this.constructEcpCharSequence(itemName)));
-
-        // Adding encoded versions to the ECP map
-        this.mappedItems.set(itemName, ecpStrFormatArray);
-
-        return { key: itemName, value: ecpStrFormatArray };
+        return { key: itemName, value: ecpFormatDistinctArray };
     }
 
     private swapPreMappedKeywords(ecpString: string): string {
