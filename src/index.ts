@@ -13,16 +13,8 @@ export default class EasyCopyPaste {
 
     private readonly mappedItems = new Map<string, string[]>;
 
-    constructor(private useBoldChars: boolean = false, private useShortKeyWordMapping: boolean = true) {}
+    constructor(private useBoldChars: boolean = false, private useShortKeyWordMapping: boolean = true) { }
 
-    /**
-     * Turns the input char sequence into an easily copyable string while it saves the original form and
-     * alternative forms into the memory.
-     * 
-     * @param {string} itemOriginalName The item's original name 
-     * @param {'buy' | 'sell'} botSideIntent The intent from the bot's perspective
-     * @returns 
-     */
     public toEcpStr(itemOriginalName: string, botSideIntent: 'buy' | 'sell'): string {
         if (itemOriginalName.length === 0) throw new Error("Empty string can't be turned into ECP string!");
 
@@ -49,12 +41,6 @@ export default class EasyCopyPaste {
         return nativeEcpString;
     }
 
-    /**
-     * Method to convert an easily copy-pasteable string back to the original format of the item's name.
-     * 
-     * @param {string} ecpStr The ECP string which needs to be reversed back.
-     * @returns {IntentDescriptor | undefined} IntentDescriptor if mapped value was found, undefined otherwise.
-     */
     public reverseEcpStr(ecpStr: string): IntentDescriptor | undefined {
         if (ecpStr.length === 0) throw new Error("Input ECP string's lenght is 0!");
 
