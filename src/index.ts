@@ -3,7 +3,11 @@ export default class EasyCopyPaste {
     private readonly nativeCharSequence = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private readonly boldCharSequence = "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵";
 
-    private readonly keyWordMap = new Map<string, string>([
+    private readonly mappedItems = new Map<string, string[]>;
+
+    private _useBoldChars = false;
+    private _useWordSwap = false;
+    private _keyWordMap = new Map<string, string>([
         ["Australium", "Aus"],
         ["Killstreak", "Ks"],
         ["Specialized", "Spec"],
@@ -11,9 +15,29 @@ export default class EasyCopyPaste {
         ["'s", "s"]
     ]);
 
-    private readonly mappedItems = new Map<string, string[]>;
+    get useBoldChars(): boolean {
+        return this._useBoldChars;
+    }
 
-    constructor(private useBoldChars: boolean = false, private useShortKeyWordMapping: boolean = true) { }
+    set useBoldChars(useBoldChars: boolean) {
+        this._useBoldChars = useBoldChars;
+    }
+
+    get useWordSwap(): boolean {
+        return this._useWordSwap;
+    }
+
+    set useWordSwap(useWordSwap: boolean) {
+        this._useWordSwap = useWordSwap;
+    }
+
+    get keyWordMap(): Map<string, string> {
+        return this._keyWordMap;
+    }
+
+    set keyWordMap(wordMap: Map<string, string>) {
+        this._keyWordMap = wordMap;
+    }
 
     public toEcpStr(itemOriginalName: string, botSideIntent: 'buy' | 'sell'): string {
         if (itemOriginalName.length === 0) throw new Error("Input could not be turned into ECP string because its length was 0!");
@@ -24,7 +48,7 @@ export default class EasyCopyPaste {
 
         let finalEcpStr = mappedEcpEntry.value[0];
 
-        if (this.useShortKeyWordMapping) {
+        if (this.useWordSwap) {
             for (let ecpStrEntry of mappedEcpEntry.value) {
                 if (ecpStrEntry.length < finalEcpStr.length) {
                     finalEcpStr = ecpStrEntry;

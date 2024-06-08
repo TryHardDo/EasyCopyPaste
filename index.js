@@ -1,20 +1,38 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class EasyCopyPaste {
-    constructor(useBoldChars = false, useShortKeyWordMapping = true) {
-        this.useBoldChars = useBoldChars;
-        this.useShortKeyWordMapping = useShortKeyWordMapping;
+    constructor() {
         this.delimiters = [` `, `'`, `-`, `/`, `.`, `#`, `!`, `:`, `(`, `)`, `,`];
         this.nativeCharSequence = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         this.boldCharSequence = "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵";
-        this.keyWordMap = new Map([
+        this.mappedItems = new Map;
+        this._useBoldChars = false;
+        this._useWordSwap = false;
+        this._keyWordMap = new Map([
             ["Australium", "Aus"],
             ["Killstreak", "Ks"],
             ["Specialized", "Spec"],
             ["Professional", "Pro"],
             ["'s", "s"]
         ]);
-        this.mappedItems = new Map;
+    }
+    get useBoldChars() {
+        return this._useBoldChars;
+    }
+    set useBoldChars(useBoldChars) {
+        this._useBoldChars = useBoldChars;
+    }
+    get useWordSwap() {
+        return this._useWordSwap;
+    }
+    set useWordSwap(useWordSwap) {
+        this._useWordSwap = useWordSwap;
+    }
+    get keyWordMap() {
+        return this._keyWordMap;
+    }
+    set keyWordMap(wordMap) {
+        this._keyWordMap = wordMap;
     }
     toEcpStr(itemOriginalName, botSideIntent) {
         if (itemOriginalName.length === 0)
@@ -23,7 +41,7 @@ class EasyCopyPaste {
         const customerSideIntent = botSideIntent === 'buy' ? 'sell' : 'buy';
         const mappedEcpEntry = this.mapString(itemOriginalName);
         let finalEcpStr = mappedEcpEntry.value[0];
-        if (this.useShortKeyWordMapping) {
+        if (this.useWordSwap) {
             for (let ecpStrEntry of mappedEcpEntry.value) {
                 if (ecpStrEntry.length < finalEcpStr.length) {
                     finalEcpStr = ecpStrEntry;
