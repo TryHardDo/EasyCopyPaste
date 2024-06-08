@@ -16,7 +16,7 @@ export default class EasyCopyPaste {
     constructor(private useBoldChars: boolean = false, private useShortKeyWordMapping: boolean = true) { }
 
     public toEcpStr(itemOriginalName: string, botSideIntent: 'buy' | 'sell'): string {
-        if (itemOriginalName.length === 0) throw new Error("Empty string can't be turned into ECP string!");
+        if (itemOriginalName.length === 0) throw new Error("Input could not be turned into ECP string because its length was 0!");
 
         // Customer side has inverted vision to intent. When they want to buy we actually having a sell listing.
         const customerSideIntent = botSideIntent === 'buy' ? 'sell' : 'buy';
