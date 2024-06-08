@@ -8,7 +8,7 @@ export default class EasyCopyPaste {
         ["Killstreak", "Ks"],
         ["Specialized", "Spec"],
         ["Professional", "Pro"],
-        ["Collector's", "Collectors"]
+        ["'s", "s"]
     ]);
 
     private readonly mappedItems = new Map<string, string[]>;

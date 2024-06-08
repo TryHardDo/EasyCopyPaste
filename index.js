@@ -12,7 +12,7 @@ class EasyCopyPaste {
             ["Killstreak", "Ks"],
             ["Specialized", "Spec"],
             ["Professional", "Pro"],
-            ["Collector's", "Collectors"]
+            ["'s", "s"]
         ]);
         this.mappedItems = new Map;
     }
