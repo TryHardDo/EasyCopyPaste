@@ -130,7 +130,7 @@ export default class EasyCopyPaste {
     private swapPreMappedKeywords(ecpString: string): string {
         let result = ecpString;
 
-        for (let [keyword, value] of this.keyWordMap) {;
+        for (let [keyword, value] of this.keyWordMap) {
             const regex = new RegExp(keyword, 'gi');
             result = result.replace(regex, value);
         }
